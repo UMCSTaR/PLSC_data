@@ -1,0 +1,65 @@
+---
+title: "Data Pull"
+author: "Xilin Chen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = F,                                     # code
+  message = F,
+  warning = F,
+  error = F,
+  comment = NA,
+  R.options = list(width = 220),
+  dev.args = list(bg = 'transparent'),          # viz
+  dev = 'png',
+  fig.align = 'center',
+  cache = F
+  # out.width = '80%'
+  # fig.asp = .5,
+)  
+
+kable_df <- function(..., digits=2) {
+  kable(...,digits = digits) %>% 
+    kable_styling(full_width = F)
+}
+
+library(tidyverse)
+library(tidyext)
+library(kableExtra)
+library(DT)
+```
+
+
+```{r import_data}
+load("~/Documents/Repo/PLSC_data/data/2019_03_14/evals.Rda")
+```
+
+```{r select_variables}
+evals_yyh = evals %>% 
+  select(program, programID, procName, procID,
+         procStartTime, date,
+         evalCompleted,
+         raterID,
+         subjectID,
+         raterRole,
+         subjectRole,
+         traineePGY,
+         traineeType,
+         supervision,
+         performance
+)
+```
+
+
+```{r anonymize}
+evals_yyh_deid = evals_yyh %>% 
+      mutate_at(vars(program), anonymizer::anonymize)
+
+
+write.csv(evals_yyh_deid, file = "data/plsc_data_deid.csv")
+
+```
+
